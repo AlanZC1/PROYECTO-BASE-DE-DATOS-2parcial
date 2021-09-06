@@ -1,0 +1,19 @@
+create or replace function obtener_ventas_totales(apellido_empleado varchar)
+RETURNS TABLE (empleado_apellido varchar,
+	total_ventas numeric)
+as $BODY$
+begin
+	RETURN QUERY
+	select 
+		empleado.empleado_apellido as Nombre,
+		sum(detalles_venta.detalles_total) as total
+		from empleado
+			inner join venta on venta.empleado_codigo = empleado.empleado_codigo
+			inner join detalles_venta on detalles_venta.venta_id = venta.venta_id
+			where empleado.empleado_apellido=apellido_empleado
+			group by empleado.empleado_apellido;
+end
+$BODY$ language plpgsql;
+
+
+select * from obtener_ventas_totales('Zamora');

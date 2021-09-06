@@ -1,0 +1,9 @@
+select  categoria.CATEGORIA_DESCRIPCION, producto.PRODUCTO_NOMBRE, detalles_venta.DETALLES_CANTIDAD_PRODUCTO,
+extract(year from detalles_venta.fecha_venta) 
+from venta
+inner join detalles_venta on venta.venta_id=detalles_venta.venta_id
+inner join producto on producto.producto_codigo=detalles_venta.producto_codigo
+inner join categoria on categoria.categoria_id=producto.categoria_id
+inner join empleado on empleado.empleado_codigo = venta.empleado_codigo
+inner join sucursal on sucursal.sucursal_codigo = empleado.sucursal_codigo
+where extract(year from detalles_venta.fecha_venta) = '2021'

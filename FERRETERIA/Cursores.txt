@@ -1,0 +1,73 @@
+/*Cursor: Por cada trabajador, que se consulte cuantas devoluciones de productos ha tenido, cuantas ventas a lo largo de su tiempo en ese trabajo ha realizado y cuanto  ha representado de ingreso en el local	*/
+--devoluciones		
+do $$
+declare
+	registro RECORD;
+	cur_devo CURSOR for
+		select 
+        empleado.empleado_apellido as TRABAJADOR,
+		count (devoluciones.devolucion_descripcion) AS DEVOLUCIONES
+		from empleado
+			inner join venta on venta.empleado_codigo = empleado.empleado_codigo
+			inner join devoluciones on devoluciones.venta_id = venta.venta_id
+			where devoluciones.devolucion_descripcion='SI'
+			group by empleado.empleado_apellido, venta.venta_id,devoluciones.devolucion_descripcion;
+begin
+OPEN cur_devo;
+Fetch cur_devo into registro;
+while (found) loop
+raise notice 'Sucursal: % | Devoluciones: % '
+,registro.trabajador, registro.devoluciones;
+Fetch cur_devo into registro;
+end loop;
+end $$
+language 'plpgsql';
+
+--VENTAS
+do $$
+declare
+	registro RECORD;
+	cur_devo CURSOR for
+		select 
+        empleado.empleado_apellido as TRABAJADOR,
+		count (devoluciones.devolucion_descripcion) AS DEVOLUCIONES
+		from empleado
+			inner join venta on venta.empleado_codigo = empleado.empleado_codigo
+			inner join devoluciones on devoluciones.venta_id = venta.venta_id
+			where devoluciones.devolucion_descripcion='NO'
+			group by empleado.empleado_apellido, venta.venta_id,devoluciones.devolucion_descripcion;
+begin
+OPEN cur_devo;
+Fetch cur_devo into registro;
+while (found) loop
+raise notice 'Sucursal: % | Ventas : % '
+,registro.trabajador, registro.devoluciones;
+Fetch cur_devo into registro;
+end loop;
+end $$
+language 'plpgsql';
+
+-- ventas 
+do $$
+declare
+	registro RECORD;
+	cur_devo CURSOR for
+		select 
+		empleado.empleado_apellido as Nombre,
+        count(venta.empleado_codigo) as veces,
+		sum(detalles_venta.detalles_total) as total
+		from empleado
+			inner join venta on venta.empleado_codigo = empleado.empleado_codigo
+			inner join detalles_venta on detalles_venta.venta_id = venta.venta_id
+			inner join devoluciones on devoluciones.venta_id = venta.venta_id
+			group by empleado.empleado_apellido;
+begin
+OPEN cur_devo;
+Fetch cur_devo into registro;
+while (found) loop
+raise notice 'Empleado: % | veces : % | Ventas : % '
+,registro.Nombre, registro.veces, registro.total;
+Fetch cur_devo into registro;
+end loop;
+end $$
+language 'plpgsql';
